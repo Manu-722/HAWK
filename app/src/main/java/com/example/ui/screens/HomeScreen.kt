@@ -180,8 +180,9 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.End,
                         modifier = Modifier.padding(end = 6.dp)
                     ) {
+                        val firstName = currentUser!!.fullName.trim().substringBefore(" ").uppercase()
                         Text(
-                            text = currentUser!!.fullName.uppercase(),
+                            text = firstName,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.SansSerif,
