@@ -178,7 +178,7 @@ fun HomeScreen(
                 if (currentUser != null) {
                     Column(
                         horizontalAlignment = Alignment.End,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 6.dp)
                     ) {
                         Text(
                             text = currentUser!!.fullName.uppercase(),
@@ -189,14 +189,14 @@ fun HomeScreen(
                         )
                         if (currentUser!!.isAdmin) {
                             Text(
-                                text = "ADMIN ACCESS",
+                                text = "ADMIN",
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                                 fontFamily = FontFamily.SansSerif,
                                 modifier = Modifier
                                     .background(Color.Black, RoundedCornerShape(12.dp))
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
                                     .clickable { onNavigateToAdmin() }
                             )
                         } else {
@@ -218,41 +218,41 @@ fun HomeScreen(
                             showSettingsDialog = true
                         },
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(34.dp)
                             .background(SleekSlate100, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Settings",
                             tint = SleekSlate950,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     IconButton(
                         onClick = { showLogoutDialog = true },
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(34.dp)
                             .background(SleekSlate100, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Logout,
                             contentDescription = "Log Out",
                             tint = SleekSlate950,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
                 } else {
                     Button(
                         onClick = onNavigateToAuth,
-                        shape = RoundedCornerShape(24.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White,
                             contentColor = SleekSlate950
                         ),
                         border = BorderStroke(1.dp, SleekSlate200),
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-                        modifier = Modifier.height(36.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.height(34.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Login,
@@ -260,10 +260,10 @@ fun HomeScreen(
                             modifier = Modifier.size(14.dp),
                             tint = SleekSlate950
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Login",
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.Bold
                         )

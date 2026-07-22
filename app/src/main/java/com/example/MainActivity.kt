@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.CompareArrows
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -38,8 +39,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
-                MainAppContainer()
+            MyApplicationTheme(darkTheme = false) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.White
+                ) {
+                    MainAppContainer()
+                }
             }
         }
     }
@@ -54,19 +60,20 @@ fun MainAppContainer() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Retrieve active cart items to show badge count
+    // Retrieve active cart items and user state
     val cartItems by viewModel.cartItems.collectAsState()
     val cartCount = cartItems.sumOf { it.first.quantity }
+    val currentUser by viewModel.currentUser.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            // Only show bottom navigation on core storefront screens
-            if (currentRoute == "home" || currentRoute == "compare" || currentRoute == "cart") {
+            // Show bottom navigation on core storefront screens and admin dashboard
+            if (currentRoute in listOf("home", "compare", "cart", "admin")) {
                 NavigationBar(
                     containerColor = Color.White,
                     tonalElevation = 0.dp,
-                    modifier = Modifier.border(1.dp, SleekSlate100)
+                    modifier = Modifier.border(1.dp, SleekSlate200)
                 ) {
                     NavigationBarItem(
                         selected = currentRoute == "home",
@@ -163,6 +170,34 @@ fun MainAppContainer() {
                             unselectedTextColor = SleekSlate400
                         )
                     )
+
+                    // Admin Portal tab at the bottom - EXCLUSIVE FOR ADMINS ONLY
+                    if (currentUser?.isAdmin == true) {
+                        NavigationBarItem(
+                            selected = currentRoute == "admin",
+                            onClick = {
+                                if (currentRoute != "admin") {
+                                    navController.navigate("admin")
+                                }
+                            },
+                            icon = { Icon(Icons.Default.AdminPanelSettings, contentDescription = "Admin Portal") },
+                            label = {
+                                Text(
+                                    text = "Admin Portal",
+                                    fontSize = 10.sp,
+                                    fontFamily = FontFamily.SansSerif,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Color.Black,
+                                selectedTextColor = Color.Black,
+                                indicatorColor = SleekSlate200,
+                                unselectedIconColor = SleekSlate400,
+                                unselectedTextColor = SleekSlate400
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -240,7 +275,12 @@ fun MainAppContainer() {
                 AuthScreen(
                     viewModel = viewModel,
                     onAuthSuccess = {
-                        navController.popBackStack()
+                        val popped = navController.popBackStack()
+                        if (!popped) {
+                            navController.navigate("home") {
+                                popUpTo("home") { inclusive = false }
+                            }
+                        }
                     }
                 )
             }

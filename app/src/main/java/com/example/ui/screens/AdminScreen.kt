@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
@@ -52,56 +54,144 @@ fun AdminScreen(
     val isAuthorized = currentUser != null && currentUser!!.isAdmin
 
     if (!isAuthorized) {
+        var quickAdminEmail by remember { mutableStateOf("admin1@induction.com") }
+        var quickAdminPassword by remember { mutableStateOf("") }
+        var isQuickPasswordVisible by remember { mutableStateOf(false) }
+        var quickAuthError by remember { mutableStateOf<String?>(null) }
+
         Box(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(24.dp),
+                .padding(20.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .widthIn(max = 400.dp)
+                    .widthIn(max = 420.dp)
                     .border(1.dp, SleekSlate200, RoundedCornerShape(24.dp))
                     .background(SleekSlate50, RoundedCornerShape(24.dp))
-                    .padding(28.dp),
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    Icons.Default.Security,
-                    contentDescription = "Security Alert",
-                    tint = Color.Black,
-                    modifier = Modifier.size(56.dp)
+                Image(
+                    painter = painterResource(id = R.drawable.hawk_logo),
+                    contentDescription = "Hawk Life Solutions Logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, SleekSlate200, CircleShape)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
-                    text = "Access Denied",
-                    fontSize = 18.sp,
+                    text = "HAWK LIFE SOLUTIONS",
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    color = SleekSlate500,
+                    letterSpacing = 1.sp
+                )
+                Text(
+                    text = "Admin Portal Login",
+                    fontSize = 20.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Black,
-                    color = Color.Black,
+                    color = SleekSlate950,
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "This area is strictly restricted to authorized administrator credentials. Unauthenticated access attempts are logged. Please return to the customer terminal.",
-                    fontSize = 13.sp,
-                    color = SleekSlate500,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 18.sp
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = quickAdminEmail,
+                    onValueChange = { 
+                        quickAdminEmail = it
+                        quickAuthError = null
+                    },
+                    placeholder = { Text("Admin Email", fontSize = 13.sp, color = SleekSlate400) },
+                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Admin", tint = SleekSlate500) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = SleekSlate200,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+
+                OutlinedTextField(
+                    value = quickAdminPassword,
+                    onValueChange = { 
+                        quickAdminPassword = it
+                        quickAuthError = null
+                    },
+                    placeholder = { Text("Admin Password", fontSize = 13.sp, color = SleekSlate400) },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password", tint = SleekSlate500) },
+                    trailingIcon = {
+                        IconButton(onClick = { isQuickPasswordVisible = !isQuickPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isQuickPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = "Toggle Password",
+                                tint = SleekSlate600
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    visualTransformation = if (isQuickPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = SleekSlate200,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
+                )
+
+                if (quickAuthError != null) {
+                    Text(
+                        text = quickAuthError!!,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+
                 Button(
-                    onClick = onBack,
+                    onClick = {
+                        if (quickAdminEmail.isBlank() || quickAdminPassword.isBlank()) {
+                            quickAuthError = "Please enter Admin Email and Password."
+                            return@Button
+                        }
+                        viewModel.login(quickAdminEmail, quickAdminPassword) { success ->
+                            if (!success) {
+                                quickAuthError = "Invalid Admin credentials."
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black,
                         contentColor = Color.White
                     ),
-                    modifier = Modifier.height(48.dp)
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
                 ) {
-                    Text("Return to Store Terminal", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("Unlock Admin Dashboard", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextButton(onClick = onBack) {
+                    Text("Return to Storefront", fontSize = 12.sp, color = SleekSlate600, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
