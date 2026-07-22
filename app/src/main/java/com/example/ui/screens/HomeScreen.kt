@@ -32,6 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.R
 import com.example.StoreViewModel
 import com.example.data.Product
 import com.example.ui.components.InductionCookerGraphic
@@ -141,20 +145,15 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
+                Image(
+                    painter = painterResource(id = R.drawable.hawk_logo),
+                    contentDescription = "Hawk Life Solutions Logo",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(32.dp)
-                        .background(Color.Black, RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "H",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontFamily = FontFamily.SansSerif
-                    )
-                }
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, SleekSlate200, CircleShape)
+                )
                 Column {
                     Text(
                         text = "HAWK INDUCTIONS",

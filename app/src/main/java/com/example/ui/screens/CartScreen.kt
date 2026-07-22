@@ -18,6 +18,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.R
 import com.example.StoreViewModel
 import com.example.data.Order
 import com.example.data.OrderItem
@@ -207,32 +212,48 @@ fun CartScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(32.dp)
+                        modifier = Modifier.padding(28.dp)
                     ) {
-                        Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = "Checked",
-                            modifier = Modifier.size(64.dp),
-                            tint = Color.Black
+                        // Hawk Logo above Thank You Message
+                        Image(
+                            painter = painterResource(id = R.drawable.hawk_logo),
+                            contentDescription = "Hawk Life Solutions Logo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, Color.Black, CircleShape)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
+
                         Text(
-                            text = "Order Placed Securely!",
+                            text = "THANK YOU FOR YOUR ORDER!",
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.Black,
-                            fontSize = 18.sp,
-                            color = SleekSlate950
+                            fontSize = 20.sp,
+                            color = SleekSlate950,
+                            textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Your payment transaction has been processed and your secure transaction reference code is:",
+                            text = "HAWK LIFE SOLUTIONS",
                             fontFamily = FontFamily.SansSerif,
-                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            color = SleekSlate500,
+                            letterSpacing = 1.sp,
+                            modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                        )
+
+                        Text(
+                            text = "Your order has been submitted to Admin for payment approval and dispatch. Your transaction reference code is:",
+                            fontFamily = FontFamily.SansSerif,
+                            fontSize = 12.sp,
                             color = SleekSlate600,
                             textAlign = TextAlign.Center,
-                            lineHeight = 18.sp
+                            lineHeight = 16.sp
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
+
                         Surface(
                             color = SleekSlate50,
                             shape = RoundedCornerShape(12.dp),
@@ -241,7 +262,7 @@ fun CartScreen(
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(14.dp)
                             ) {
                                 Text(
                                     text = generatedReference,
@@ -253,7 +274,7 @@ fun CartScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "DISPATCH & DELIVERY CODE",
+                                    text = "PAYMENT & DISPATCH REFERENCE",
                                     fontFamily = FontFamily.SansSerif,
                                     fontWeight = FontWeight.Black,
                                     fontSize = 9.sp,
@@ -262,9 +283,10 @@ fun CartScreen(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
+
                         Text(
-                            text = "The code has been successfully sent to your registered email and phone number. Our delivery operators will verify this code upon dropoff.",
+                            text = "Once Admin approves your pending charge, your order status will be updated to APPROVED & DISPATCHED.",
                             fontFamily = FontFamily.SansSerif,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -272,7 +294,8 @@ fun CartScreen(
                             textAlign = TextAlign.Center,
                             lineHeight = 16.sp
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
+
                         Button(
                             onClick = {
                                 selectedCartTab = "ORDERS"
@@ -285,7 +308,7 @@ fun CartScreen(
                             ),
                             modifier = Modifier.height(48.dp)
                         ) {
-                            Text("View Receipts", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("View Order Status & Receipts", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                 }
@@ -467,8 +490,9 @@ fun CartScreen(
                             )
 
                             // Clean mobile payment guidelines
-                            PaymentGuideline(label = "Business Paybill Number", value = "522123")
-                            PaymentGuideline(label = "Account Number", value = "HAWK77")
+                            PaymentGuideline(label = "Business Paybill Number", value = "522522")
+                            PaymentGuideline(label = "Account Number", value = "7518213")
+                            PaymentGuideline(label = "Account Name", value = "Hawk Life Solutions")
                             PaymentGuideline(label = "Exact Amount Due", value = "KSh ${String.format("%,.0f", cartTotal)}")
 
                             Spacer(modifier = Modifier.height(16.dp))

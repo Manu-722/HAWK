@@ -125,7 +125,7 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun loginWithGoogleSimulated(email: String, name: String) {
+    fun loginWithGoogleSimulated(email: String, name: String, phoneNumber: String = "") {
         viewModelScope.launch {
             val cleanedEmail = email.trim().lowercase()
             // Check if admin email or regular
@@ -137,8 +137,12 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
                     email = cleanedEmail,
                     fullName = name,
                     passwordHash = "google_sign_in_token",
-                    isAdmin = isAdminEmail
+                    isAdmin = isAdminEmail,
+                    phoneNumber = phoneNumber
                 )
+                repository.insertUser(user)
+            } else if (phoneNumber.isNotBlank()) {
+                user = user.copy(phoneNumber = phoneNumber)
                 repository.insertUser(user)
             }
             _currentUser.value = user

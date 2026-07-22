@@ -8,23 +8,31 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.StoreViewModel
 import com.example.ui.theme.*
 
@@ -40,6 +48,8 @@ fun AuthScreen(
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     var localError by remember { mutableStateOf<String?>(null) }
 
     val authError by viewModel.authError.collectAsState()
@@ -50,6 +60,7 @@ fun AuthScreen(
     var showGoogleDialog by remember { mutableStateOf(false) }
     var googleEmail by remember { mutableStateOf("emmanuelmulongo46@gmail.com") }
     var googleName by remember { mutableStateOf("Emmanuel Mulongo") }
+    var googlePhone by remember { mutableStateOf("") }
     var isCheckingGoogleSession by remember { mutableStateOf(false) }
 
     // Dialog for Forgot Password Flow
@@ -85,10 +96,22 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Header - Sleek Style
+            // Header - Hawk Logo & Title
+            Image(
+                painter = painterResource(id = R.drawable.hawk_logo),
+                contentDescription = "Hawk Life Solutions Logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .border(1.5.dp, SleekSlate200, CircleShape)
+                    .padding(bottom = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
             Text(
                 text = "HAWK INDUCTIONS",
-                fontSize = 28.sp,
+                fontSize = 24.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Black,
                 letterSpacing = (-0.5).sp,
@@ -102,7 +125,7 @@ fun AuthScreen(
                 fontWeight = FontWeight.Bold,
                 color = SleekSlate500,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 2.dp, bottom = 20.dp)
             )
 
             Text(
@@ -114,7 +137,7 @@ fun AuthScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Input Fields - Sleek Style
+            // Input Fields - High Contrast & Text Color Fix
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -124,6 +147,8 @@ fun AuthScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = SleekSlate200,
                     focusedContainerColor = SleekSlate50,
@@ -141,6 +166,8 @@ fun AuthScreen(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         focusedBorderColor = Color.Black,
                         unfocusedBorderColor = SleekSlate200,
                         focusedContainerColor = SleekSlate50,
@@ -149,6 +176,7 @@ fun AuthScreen(
                 )
             }
 
+            // Password field with eye show/hide icon toggle
             OutlinedTextField(
                 value = password,
                 onValueChange = { 
@@ -157,11 +185,22 @@ fun AuthScreen(
                 },
                 placeholder = { Text("Password", fontSize = 14.sp, color = SleekSlate400) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password", tint = SleekSlate500) },
+                trailingIcon = {
+                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                        Icon(
+                            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "Toggle Password Visibility",
+                            tint = SleekSlate600
+                        )
+                    }
+                },
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedBorderColor = Color.Black,
                     unfocusedBorderColor = SleekSlate200,
                     focusedContainerColor = SleekSlate50,
@@ -170,6 +209,7 @@ fun AuthScreen(
             )
 
             if (isSignUp) {
+                // Confirm Password field with eye show/hide icon toggle
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { 
@@ -178,11 +218,22 @@ fun AuthScreen(
                     },
                     placeholder = { Text("Confirm Password", fontSize = 14.sp, color = SleekSlate400) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Confirm Password", tint = SleekSlate500) },
+                    trailingIcon = {
+                        IconButton(onClick = { isConfirmPasswordVisible = !isConfirmPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isConfirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = "Toggle Confirm Password Visibility",
+                                tint = SleekSlate600
+                            )
+                        }
+                    },
                     singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
                         focusedBorderColor = Color.Black,
                         unfocusedBorderColor = SleekSlate200,
                         focusedContainerColor = SleekSlate50,
@@ -382,6 +433,12 @@ fun AuthScreen(
 
     // Google Sign-In Sheet Dialog Simulator - Sleek Style
     if (showGoogleDialog) {
+        val detectedAccounts = listOf(
+            "emmanuelmulongo46@gmail.com" to "Emmanuel Mulongo",
+            "hawk.inductions.official@gmail.com" to "Hawk Operations",
+            "admin1@induction.com" to "Hawk Administrator"
+        )
+
         AlertDialog(
             onDismissRequest = { showGoogleDialog = false },
             confirmButton = {
@@ -389,10 +446,9 @@ fun AuthScreen(
                     onClick = {
                         if (googleEmail.isNotBlank()) {
                             val finalName = googleName.ifBlank { googleEmail.substringBefore("@") }
-                            // Pick, autofill, and sign in!
                             email = googleEmail
                             name = finalName
-                            viewModel.loginWithGoogleSimulated(googleEmail, finalName)
+                            viewModel.loginWithGoogleSimulated(googleEmail, finalName, googlePhone)
                             showGoogleDialog = false
                             onAuthSuccess()
                         }
@@ -404,7 +460,7 @@ fun AuthScreen(
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                 ) {
-                    Text("Autofill & Sign In Instantly", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
+                    Text("Confirm Google Account & Sign In", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -423,21 +479,21 @@ fun AuthScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
                             .background(SleekSlate100),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "G",
-                            fontSize = 13.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Black,
                             fontFamily = FontFamily.SansSerif,
                             color = Color.Black
                         )
                     }
                     Text(
-                        text = "Google Identity Service",
+                        text = "Sign in with Google",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraBold,
                         fontFamily = FontFamily.SansSerif,
@@ -448,125 +504,112 @@ fun AuthScreen(
             text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Hawk Inductions detected an active Google account on this device. Tap below to pick these credentials, autofill, and log in securely.",
+                        text = "Choose an account from Google to continue to Hawk Life Solutions:",
                         fontSize = 12.sp,
                         fontFamily = FontFamily.SansSerif,
                         color = SleekSlate600,
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        lineHeight = 16.sp
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    // Active Session Card
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                            .border(1.dp, SleekSlate200, RoundedCornerShape(16.dp)),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = SleekSlate50)
-                    ) {
-                        Row(
+                    // Account List Selector
+                    detectedAccounts.forEach { (accEmail, accName) ->
+                        val isSelected = (googleEmail == accEmail)
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(bottom = 8.dp)
+                                .border(
+                                    1.dp,
+                                    if (isSelected) Color.Black else SleekSlate200,
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .clickable {
+                                    googleEmail = accEmail
+                                    googleName = accName
+                                },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) SleekSlate100 else Color.White
+                            )
                         ) {
-                            // Avatar Box
-                            Box(
+                            Row(
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.Black),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = googleName.take(1).uppercase(),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isSelected) Color.Black else SleekSlate300),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = accName.take(1).uppercase(),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
 
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = googleName,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = SleekSlate950
-                                )
-                                Text(
-                                    text = googleEmail,
-                                    fontSize = 11.sp,
-                                    color = SleekSlate500
-                                )
-                            }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = accName,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = SleekSlate950
+                                    )
+                                    Text(
+                                        text = accEmail,
+                                        fontSize = 10.sp,
+                                        color = SleekSlate500
+                                    )
+                                }
 
-                            // Checkmark/Verified badge
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.Black),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "✓",
-                                    color = Color.White,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                if (isSelected) {
+                                    Text(
+                                        text = "✓ Selected",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black
+                                    )
+                                }
                             }
                         }
                     }
 
-                    // Collapsible option to enter a custom Google account manually
-                    var showManualFields by remember { mutableStateOf(false) }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    if (!showManualFields) {
-                        Text(
-                            text = "Use another Google Account",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.SansSerif,
-                            color = SleekSlate600,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .clickable { showManualFields = true }
-                                .padding(4.dp)
-                        )
-                    } else {
-                        OutlinedTextField(
-                            value = googleEmail,
-                            onValueChange = { googleEmail = it },
-                            placeholder = { Text("Google Email Address", fontSize = 13.sp, color = SleekSlate400) },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = SleekSlate200,
-                                focusedContainerColor = SleekSlate50,
-                                unfocusedContainerColor = SleekSlate50
-                            )
-                        )
+                    // Phone Number Request to Complete Profile
+                    Text(
+                        text = "Complete Profile Details",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.SansSerif,
+                        color = SleekSlate950,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
 
-                        OutlinedTextField(
-                            value = googleName,
-                            onValueChange = { googleName = it },
-                            placeholder = { Text("Profile Name", fontSize = 13.sp, color = SleekSlate400) },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = SleekSlate200,
-                                focusedContainerColor = SleekSlate50,
-                                unfocusedContainerColor = SleekSlate50
-                            )
+                    OutlinedTextField(
+                        value = googlePhone,
+                        onValueChange = { googlePhone = it },
+                        placeholder = { Text("Phone Number (+254 7XX XXX XXX)", fontSize = 12.sp, color = SleekSlate400) },
+                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "Phone", tint = SleekSlate500) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = SleekSlate200,
+                            focusedContainerColor = SleekSlate50,
+                            unfocusedContainerColor = SleekSlate50
                         )
-                    }
+                    )
                 }
             },
             shape = RoundedCornerShape(24.dp),

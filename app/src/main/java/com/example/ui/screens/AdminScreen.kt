@@ -21,6 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.R
 import com.example.StoreViewModel
 import com.example.data.Order
 import com.example.data.Product
@@ -181,17 +185,27 @@ fun AdminScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
             }
             Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = painterResource(id = R.drawable.hawk_logo),
+                contentDescription = "Hawk Life Solutions Logo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, SleekSlate200, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
                     text = "Admin Dashboard",
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Black,
                     letterSpacing = (-0.5).sp,
                     color = SleekSlate950
                 )
                 Text(
-                    text = "Add systems, manage stocks & customer orders",
+                    text = "Hawk Life Solutions Management",
                     fontSize = 11.sp,
                     fontFamily = FontFamily.SansSerif,
                     color = SleekSlate500
@@ -713,10 +727,10 @@ fun AdminScreen(
                                         }
 
                                         // Status management triggers
-                                        if (order.status != "Delivered") {
+                                        if (order.status != "APPROVED & DISPATCHED" && order.status != "Delivered") {
                                             Button(
                                                 onClick = {
-                                                    val nextStatus = if (order.status == "Pending Approval") "Shipped" else "Delivered"
+                                                    val nextStatus = if (order.status == "Pending Approval") "APPROVED & DISPATCHED" else "Delivered"
                                                     viewModel.updateOrderStatusAdmin(order.id, nextStatus)
                                                 },
                                                 shape = RoundedCornerShape(16.dp),
@@ -724,11 +738,11 @@ fun AdminScreen(
                                                     containerColor = Color.Black,
                                                     contentColor = Color.White
                                                 ),
-                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                                modifier = Modifier.height(32.dp)
+                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                                modifier = Modifier.height(36.dp)
                                             ) {
                                                 Text(
-                                                    text = if (order.status == "Pending Approval") "Ship System" else "Deliver",
+                                                    text = if (order.status == "Pending Approval") "APPROVE PAYMENT & DISPATCH" else "MARK DELIVERED",
                                                     fontSize = 11.sp,
                                                     fontFamily = FontFamily.SansSerif,
                                                     fontWeight = FontWeight.Bold
