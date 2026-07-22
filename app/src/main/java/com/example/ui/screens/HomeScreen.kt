@@ -98,10 +98,10 @@ fun HomeScreen(
             imageUrl = "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"
         ),
         PromotionOffer(
-            title = "ZENITH ADVANTAGE",
-            subtitle = "KSh 10,000 OFF QUAD SMART RANGE",
-            code = "ZENITH10K",
-            discount = "KSh 10000 OFF",
+            title = "Hawk single pro",
+            subtitle = "KSh 1,500 OFF QUAD SMART RANGE",
+            code = "Hawk 1k",
+            discount = "KSh 1500 OFF",
             coils = 4,
             watts = 7400,
             imageUrl = "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400"
