@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Induction glass cooktop outer ring centered -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,62m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0"
+        android:strokeWidth="4.5"
+        android:strokeColor="#FFFFFF" />
+    <!-- Cooktop inner ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,62m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF" />
+    <!-- Center pan sensing core -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,62m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <!-- Crosshair layout ticks -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M24,62h5"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,62h5"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF" />
+    <!-- High-frequency electromagnetic wave lines (center) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,40c-2,-5 2,-9 0,-14"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#FFFFFF" />
+    <!-- High-frequency electromagnetic wave lines (left) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M44,38c-1.5,-4 1.5,-7 0,-11"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#FFFFFF" />
+    <!-- High-frequency electromagnetic wave lines (right) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M64,38c-1.5,-4 1.5,-7 0,-11"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#FFFFFF" />
+</vector>

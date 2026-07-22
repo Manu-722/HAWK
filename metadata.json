@@ -1,0 +1,6 @@
+{
+  "name": "HAWK INDUCTIONS",
+  "description": "An elegant, high-end monochrome store for purchasing premium induction cookers, custom cookware, pans, non-stick sufurias, featuring a secure cart, comparison deck, and administrator credentials management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
