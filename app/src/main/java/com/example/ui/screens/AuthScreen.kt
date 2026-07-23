@@ -419,7 +419,7 @@ fun AuthScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Admin access restricted to key accounts.",
+                        text = "Your account information is encrypted and secure.",
                         fontSize = 11.sp,
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.SemiBold,

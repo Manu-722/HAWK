@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.AdminPanelSettings
-import androidx.compose.material.icons.filled.CompareArrows
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -109,7 +109,7 @@ fun MainAppContainer() {
                                 navController.navigate("compare")
                             }
                         },
-                        icon = { Icon(Icons.Default.CompareArrows, contentDescription = "Compare") },
+                        icon = { Icon(Icons.AutoMirrored.Filled.CompareArrows, contentDescription = "Compare") },
                         label = {
                             Text(
                                 text = "Compare",

@@ -16,6 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -221,7 +226,7 @@ fun HomeScreen(
                             .background(SleekSlate100, CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Logout,
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
                             contentDescription = "Log Out",
                             tint = SleekSlate950,
                             modifier = Modifier.size(15.dp)
@@ -240,7 +245,7 @@ fun HomeScreen(
                         modifier = Modifier.height(34.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Login,
+                            imageVector = Icons.AutoMirrored.Filled.Login,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = SleekSlate950
@@ -782,7 +787,7 @@ fun HomeScreen(
                                         .background(Color.Transparent, RoundedCornerShape(12.dp))
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.CompareArrows,
+                                        imageVector = Icons.AutoMirrored.Filled.CompareArrows,
                                         contentDescription = "Compare",
                                         tint = if (isCompared) Color.Black else SleekSlate400,
                                         modifier = Modifier.size(18.dp)
@@ -869,7 +874,7 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Help,
+                                imageVector = Icons.AutoMirrored.Filled.Help,
                                 contentDescription = "Help FAQ",
                                 tint = SleekSlate600,
                                 modifier = Modifier.size(16.dp)
@@ -895,7 +900,7 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.MenuBook,
+                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
                                 contentDescription = "Pro Tips",
                                 tint = SleekSlate600,
                                 modifier = Modifier.size(16.dp)
@@ -1004,13 +1009,16 @@ fun HomeScreen(
                                     fontFamily = FontFamily.SansSerif
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Role: ${if (user.isAdmin) "Administrator" else "Customer"}",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = if (user.isAdmin) Color.Red else SleekSlate500,
-                                    fontFamily = FontFamily.SansSerif
-                                )
+                                if (user.isAdmin) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Role: Administrator",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.Red,
+                                        fontFamily = FontFamily.SansSerif
+                                    )
+                                }
                             }
                         }
 
@@ -1128,7 +1136,7 @@ fun HomeScreen(
             },
             text = {
                 Text(
-                    text = "Are you sure you want to end your session? You will need to log in again to add items to your cart, view past orders, or perform admin operations.",
+                    text = "Are you sure you want to end your session? You will need to log in again to add items to your cart or view past orders.",
                     fontSize = 13.sp,
                     fontFamily = FontFamily.SansSerif,
                     color = SleekSlate600,

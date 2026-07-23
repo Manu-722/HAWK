@@ -246,7 +246,7 @@ fun CartScreen(
                         )
 
                         Text(
-                            text = "Your order has been submitted to Admin for payment approval and dispatch. Your transaction reference code is:",
+                            text = "Your order has been submitted for payment approval and dispatch. Your transaction reference code is:",
                             fontFamily = FontFamily.SansSerif,
                             fontSize = 12.sp,
                             color = SleekSlate600,
@@ -287,7 +287,7 @@ fun CartScreen(
                         Spacer(modifier = Modifier.height(14.dp))
 
                         Text(
-                            text = "Once Admin approves your pending charge, your order status will be updated to APPROVED & DISPATCHED.",
+                            text = "Once your pending charge is approved, your order status will be updated to APPROVED & DISPATCHED.",
                             fontFamily = FontFamily.SansSerif,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,

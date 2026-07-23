@@ -7,9 +7,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CompareArrows
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -94,7 +94,7 @@ fun CompareScreen(
                     modifier = Modifier.padding(32.dp)
                 ) {
                     Icon(
-                        Icons.Default.CompareArrows,
+                        Icons.AutoMirrored.Filled.CompareArrows,
                         contentDescription = "Compare empty",
                         modifier = Modifier.size(64.dp),
                         tint = SleekSlate300
