@@ -1,18 +1,26 @@
-*.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+# Environment and local secret files
 .env
+.env.local
+.env.*.local
+local.properties
+/local.properties
+
+# Dependency & build directories
+node_modules/
+.gradle/
+.kotlin/
+/build/
+app/build/
+.externalNativeBuild/
+.cxx/
+/captures/
+
+# IDE & OS configuration
+*.iml
+.idea/
+.DS_Store
+
+# Logs & keystores
+*.log
 debug.keystore
+

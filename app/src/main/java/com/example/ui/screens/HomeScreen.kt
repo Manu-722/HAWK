@@ -64,6 +64,7 @@ fun HomeScreen(
     val products by viewModel.products.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
     val compareList by viewModel.compareList.collectAsState()
+    val allReviews by viewModel.allReviews.collectAsState()
 
     var selectedCategory by remember { mutableStateOf("ALL") }
     var searchQuery by remember { mutableStateOf("") }
@@ -77,42 +78,47 @@ fun HomeScreen(
 
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    // Promotion Carousel Slideshow
-    val offers = listOf(
-        PromotionOffer(
-            title = "SINGLE BURNER PRO",
-            subtitle = "15% OFF PORTABLE SINGLE COOKTOPS",
-            code = "AURA15",
-            discount = "15% OFF",
-            coils = 1,
-            watts = 2200,
-            imageUrl = "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400"
-        ),
-        PromotionOffer(
-            title = "DOUBLE BURNER DUO",
-            subtitle = "KSh 5,000 DISCOUNT ON DUAL ZONE HOB",
-            code = "DUO5000",
-            discount = "KSh 5000 OFF",
-            coils = 2,
-            watts = 3500,
-            imageUrl = "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"
-        ),
-        PromotionOffer(
-            title = "Hawk single pro",
-            subtitle = "KSh 1,500 OFF QUAD SMART RANGE",
-            code = "Hawk 1k",
-            discount = "KSh 1500 OFF",
-            coils = 4,
-            watts = 7400,
-            imageUrl = "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400"
-        )
-    )
+    // Dynamic Promotion Carousel Slideshow built directly from Products in database marked as featured / slideshow
+    val offers = remember(products) {
+        val featured = products.filter { it.isFeatured }
+        val displayProducts = if (featured.isNotEmpty()) featured else products
+        if (displayProducts.isNotEmpty()) {
+            displayProducts.map { p ->
+                PromotionOffer(
+                    title = p.title,
+                    subtitle = "${p.powerWatts}W Rapid Induction • ${p.coilsCount} Zone${if (p.coilsCount > 1) "s" else ""}",
+                    code = "HAWK${p.id}",
+                    discount = "KSh ${String.format("%,.0f", p.price)}",
+                    coils = p.coilsCount,
+                    watts = p.powerWatts,
+                    imageUrl = p.imageUrl
+                )
+            }
+        } else {
+            listOf(
+                PromotionOffer(
+                    title = "Hawk Aura Single Hob",
+                    subtitle = "2200W Rapid Induction • 1 Zone",
+                    code = "HAWK1",
+                    discount = "KSh 12,500",
+                    coils = 1,
+                    watts = 2200,
+                    imageUrl = ""
+                )
+            )
+        }
+    }
     var currentOfferIndex by remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(4000)
-            currentOfferIndex = (currentOfferIndex + 1) % offers.size
+    LaunchedEffect(offers) {
+        if (currentOfferIndex >= offers.size) {
+            currentOfferIndex = 0
+        }
+        if (offers.isNotEmpty()) {
+            while (true) {
+                delay(4000)
+                currentOfferIndex = (currentOfferIndex + 1) % offers.size
+            }
         }
     }
 
@@ -175,41 +181,17 @@ fun HomeScreen(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (currentUser != null) {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        modifier = Modifier.padding(end = 6.dp)
-                    ) {
-                        val firstName = currentUser!!.fullName.trim().substringBefore(" ").uppercase()
-                        Text(
-                            text = firstName,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.SansSerif,
-                            color = SleekSlate950
-                        )
-                        if (currentUser!!.isAdmin) {
-                            Text(
-                                text = "ADMIN",
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                fontFamily = FontFamily.SansSerif,
-                                modifier = Modifier
-                                    .background(Color.Black, RoundedCornerShape(12.dp))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    .clickable { onNavigateToAdmin() }
-                            )
-                        } else {
-                            Text(
-                                text = "CUSTOMER",
-                                fontSize = 8.sp,
-                                color = SleekSlate500,
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
+                val user = currentUser
+                if (user != null) {
+                    val displayName = user.fullName.trim().substringBefore(" ").uppercase()
+                    Text(
+                        text = displayName,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.SansSerif,
+                        color = SleekSlate950,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                     IconButton(
                         onClick = {
                             changePwInput = ""
@@ -275,21 +257,22 @@ fun HomeScreen(
 
         HorizontalDivider(color = SleekSlate100)
 
-        // Slideshow Banner - Sleek Interface style
+        // Slideshow Banner - Ultra-sleek luxury showcase
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(130.dp)
-                .background(Color.Black, RoundedCornerShape(24.dp))
+                .padding(horizontal = 16.dp, vertical = 6.dp)
+                .height(155.dp)
+                .background(Color(0xFF0F172A), RoundedCornerShape(22.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(22.dp))
                 .drawBehind {
                     drawCircle(
-                        color = Color.White.copy(alpha = 0.05f),
-                        radius = 110.dp.toPx(),
-                        center = Offset(size.width - 20.dp.toPx(), size.height / 2)
+                        color = Color(0xFF38BDF8).copy(alpha = 0.08f),
+                        radius = 120.dp.toPx(),
+                        center = Offset(size.width - 25.dp.toPx(), size.height / 2)
                     )
                 }
-                .padding(20.dp),
+                .padding(16.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             val offer = offers[currentOfferIndex]
@@ -297,61 +280,84 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(end = 80.dp),
-                verticalArrangement = Arrangement.Center
+                    .padding(end = 105.dp), // Safe right margin prevents any text overlap with graphic
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "LIMITED TIME OFFER",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontFamily = FontFamily.SansSerif,
-                    color = SleekSlate400,
-                    letterSpacing = 1.5.sp
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = offer.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Black,
-                    fontFamily = FontFamily.SansSerif,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    letterSpacing = (-0.3).sp
-                )
-                Text(
-                    text = offer.subtitle,
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = SleekSlate400,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                // Category / Tag Pill
+                Surface(
+                    color = Color(0xFFE5A93C).copy(alpha = 0.18f),
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(1.dp, Color(0xFFE5A93C).copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(5.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFDE047))
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "FEATURED HOB",
+                            fontSize = 8.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontFamily = FontFamily.SansSerif,
+                            color = Color(0xFFFDE047),
+                            letterSpacing = 1.sp
+                        )
+                    }
+                }
+
+                // Main Title & Subtitle
+                Column(modifier = Modifier.padding(vertical = 2.dp)) {
+                    Text(
+                        text = offer.title,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = FontFamily.SansSerif,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = offer.subtitle,
+                        fontSize = 11.sp,
+                        fontFamily = FontFamily.SansSerif,
+                        color = Color(0xFF94A3B8),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Price & Code Badge
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "CODE: ${offer.code}",
-                        fontSize = 9.sp,
-                        fontFamily = FontFamily.SansSerif,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black,
-                        modifier = Modifier
-                            .background(Color.White, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                    Text(
-                        text = "GET ${offer.discount}",
-                        fontSize = 9.sp,
-                        fontFamily = FontFamily.SansSerif,
+                        text = offer.discount,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                        fontFamily = FontFamily.SansSerif,
+                        color = Color(0xFF4ADE80)
                     )
+                    Surface(
+                        color = Color.White.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = offer.code,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
                 }
             }
 
@@ -359,7 +365,7 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 4.dp, end = 4.dp),
+                    .padding(bottom = 2.dp, end = 2.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 offers.forEachIndexed { idx, _ ->
@@ -368,14 +374,14 @@ fun HomeScreen(
                             .size(width = if (idx == currentOfferIndex) 16.dp else 5.dp, height = 5.dp)
                             .clip(CircleShape)
                             .background(
-                                if (idx == currentOfferIndex) Color.White
-                                else Color.White.copy(alpha = 0.3f)
+                                if (idx == currentOfferIndex) Color(0xFF38BDF8)
+                                else Color.White.copy(alpha = 0.25f)
                             )
                     )
                 }
             }
 
-            // Beautiful custom vector induction cooker graphic showing single/double burners
+            // Cooker Graphic neatly positioned on the right
             InductionCookerGraphic(
                 imageUrl = offer.imageUrl,
                 title = offer.title,
@@ -384,9 +390,9 @@ fun HomeScreen(
                 isDark = true,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .padding(end = 28.dp) // Leave a bit of space on the edge
-                    .width(72.dp)
-                    .height(86.dp)
+                    .padding(end = 4.dp)
+                    .width(82.dp)
+                    .height(95.dp)
             )
         }
 
@@ -707,31 +713,38 @@ fun HomeScreen(
                                 )
                             }
 
-                            // Dynamic Star rating
+                            // Dynamic Star rating based on real reviews
+                            val productReviews = remember(allReviews, product.id) { allReviews.filter { it.productId == product.id } }
+                            val hasReviews = productReviews.isNotEmpty()
+                            val avgRating = if (hasReviews) productReviews.map { it.rating }.average() else 0.0
+                            val reviewCount = productReviews.size
+
                             Row(
                                 modifier = Modifier.padding(top = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Star,
+                                    imageVector = if (hasReviews) Icons.Default.Star else Icons.Default.StarBorder,
                                     contentDescription = "Rating",
-                                    tint = Color.Black,
+                                    tint = if (hasReviews) Color.Black else SleekSlate400,
                                     modifier = Modifier.size(11.dp)
                                 )
                                 Text(
-                                    text = "4.9",
+                                    text = if (hasReviews) String.format("%.1f", avgRating) else "No ratings",
                                     fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
+                                    fontWeight = if (hasReviews) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (hasReviews) Color.Black else SleekSlate500,
                                     fontFamily = FontFamily.SansSerif
                                 )
-                                Text(
-                                    text = "(240)",
-                                    fontSize = 10.sp,
-                                    color = SleekSlate500,
-                                    fontFamily = FontFamily.SansSerif
-                                )
+                                if (hasReviews) {
+                                    Text(
+                                        text = "($reviewCount)",
+                                        fontSize = 10.sp,
+                                        color = SleekSlate500,
+                                        fontFamily = FontFamily.SansSerif
+                                    )
+                                }
                             }
 
                             // CTA add to cart button and compare button row
@@ -961,40 +974,42 @@ fun HomeScreen(
                 }
             },
             text = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // Profile Info
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(SleekSlate50, RoundedCornerShape(12.dp))
-                            .border(1.dp, SleekSlate100, RoundedCornerShape(12.dp))
-                            .padding(12.dp)
-                    ) {
-                        Column {
-                            Text(
-                                text = "Name: ${currentUser!!.fullName}",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = SleekSlate950,
-                                fontFamily = FontFamily.SansSerif
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Email: ${currentUser!!.email}",
-                                fontSize = 12.sp,
-                                color = SleekSlate600,
-                                fontFamily = FontFamily.SansSerif
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Role: ${if (currentUser!!.isAdmin) "Administrator" else "Customer"}",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (currentUser!!.isAdmin) Color.Red else SleekSlate500,
-                                fontFamily = FontFamily.SansSerif
-                            )
+                val user = currentUser
+                if (user != null) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Profile Info
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(SleekSlate50, RoundedCornerShape(12.dp))
+                                .border(1.dp, SleekSlate100, RoundedCornerShape(12.dp))
+                                .padding(12.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = "Name: ${user.fullName}",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SleekSlate950,
+                                    fontFamily = FontFamily.SansSerif
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Email: ${user.email}",
+                                    fontSize = 12.sp,
+                                    color = SleekSlate600,
+                                    fontFamily = FontFamily.SansSerif
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Role: ${if (user.isAdmin) "Administrator" else "Customer"}",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (user.isAdmin) Color.Red else SleekSlate500,
+                                    fontFamily = FontFamily.SansSerif
+                                )
+                            }
                         }
-                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -1067,6 +1082,7 @@ fun HomeScreen(
                         )
                     }
                 }
+            }
             },
             shape = RoundedCornerShape(24.dp),
             containerColor = Color.White,

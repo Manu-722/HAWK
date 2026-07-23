@@ -127,23 +127,28 @@ fun DetailsScreen(
                     color = SleekSlate950
                 )
 
-                // Rating row under title
+                // Dynamic rating row under title from actual user/admin reviews
+                val avgRating = if (reviews.isNotEmpty()) reviews.map { it.rating }.average() else 0.0
+                val reviewCount = reviews.size
+                val fullStars = kotlin.math.round(avgRating).toInt()
+
                 Row(
                     modifier = Modifier.padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    repeat(5) {
+                    repeat(5) { starIndex ->
+                        val isFilled = reviewCount > 0 && starIndex < fullStars
                         Icon(
-                            imageVector = Icons.Default.Star,
+                            imageVector = if (isFilled) Icons.Default.Star else Icons.Default.StarBorder,
                             contentDescription = "Star",
-                            tint = Color.Black,
+                            tint = if (isFilled) Color.Black else SleekSlate300,
                             modifier = Modifier.size(14.dp)
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "4.9 (240 reviews)",
+                        text = if (reviewCount > 0) String.format("%.1f (%d review%s)", avgRating, reviewCount, if (reviewCount == 1) "" else "s") else "No reviews yet",
                         fontSize = 12.sp,
                         color = SleekSlate500,
                         fontWeight = FontWeight.Medium,
@@ -439,7 +444,7 @@ fun DetailsScreen(
 
                             if (reviews.isEmpty()) {
                                 Text(
-                                    text = "No reviews posted yet. Be the first to audit this system!",
+                                    text = "No reviews posted yet. Be the first to review this product!",
                                     fontSize = 13.sp,
                                     fontFamily = FontFamily.SansSerif,
                                     color = SleekSlate400,

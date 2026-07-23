@@ -15,6 +15,7 @@ class Repository(private val db: AppDatabase) {
     // Products
     val allProducts: Flow<List<Product>> = productDao.getAllProducts()
     val allAdmins: Flow<List<User>> = userDao.getAllAdmins()
+    val allReviews: Flow<List<Review>> = reviewDao.getAllReviews()
 
     suspend fun getProductById(id: Int): Product? = withContext(Dispatchers.IO) {
         productDao.getProductById(id)
@@ -162,8 +163,8 @@ class Repository(private val db: AppDatabase) {
         }
 
         // 2. Seed products if empty
-        val currentProducts = db.openHelper.writableDatabase.compileStatement("SELECT COUNT(*) FROM products").simpleQueryForLong()
-        if (currentProducts == 0L) {
+        val currentProducts = productDao.getProductCount()
+        if (currentProducts == 0) {
             val p1Id = productDao.insertProduct(
                 Product(
                     title = "Hawk Aura Single Hob",
@@ -275,37 +276,6 @@ class Repository(private val db: AppDatabase) {
                     category = "Non-Stick Pans"
                 )
             ).toInt()
-
-            // Seed reviews for Product 1
-            reviewDao.insertReview(
-                Review(
-                    productId = p1Id,
-                    userEmail = "john@demo.com",
-                    userName = "John Doe",
-                    rating = 5,
-                    comment = "Absolutely incredible! Boils water faster than my gas stove. Easy to clean, and looks incredibly premium in my kitchen."
-                )
-            )
-            reviewDao.insertReview(
-                Review(
-                    productId = p1Id,
-                    userEmail = "alice@demo.com",
-                    userName = "Alice Smith",
-                    rating = 4,
-                    comment = "Very sleek design. Fits nicely in my tiny studio. The touch slider is extremely responsive."
-                )
-            )
-
-            // Seed reviews for Product 2
-            reviewDao.insertReview(
-                Review(
-                    productId = p2Id,
-                    userEmail = "chef_mark@demo.com",
-                    userName = "Chef Mark",
-                    rating = 5,
-                    comment = "The heat control is incredibly precise. Perfect for professional pan-searing. Best induction cooktop I've purchased so far."
-                )
-            )
         }
     }
 }

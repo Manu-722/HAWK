@@ -61,8 +61,9 @@ fun CartScreen(
     var expandedOrderItems by remember { mutableStateOf<List<OrderItem>>(emptyList()) }
 
     LaunchedEffect(expandedOrderId) {
-        if (expandedOrderId != null) {
-            expandedOrderItems = viewModel.getOrderItems(expandedOrderId!!)
+        val targetId = expandedOrderId
+        if (targetId != null) {
+            expandedOrderItems = viewModel.getOrderItems(targetId)
         } else {
             expandedOrderItems = emptyList()
         }

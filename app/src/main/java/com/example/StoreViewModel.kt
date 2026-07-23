@@ -70,6 +70,10 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     val allAdmins: StateFlow<List<User>> = repository.allAdmins
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // All Reviews across products for dynamic ratings
+    val allReviews: StateFlow<List<Review>> = repository.allReviews
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     init {
         viewModelScope.launch {
             repository.seedDatabaseIfNeeded()
@@ -372,6 +376,12 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     fun updateOrderStatusAdmin(orderId: Int, newStatus: String) {
         viewModelScope.launch {
             repository.updateOrderStatus(orderId, newStatus)
+        }
+    }
+
+    fun toggleProductSlideshowAdmin(product: Product) {
+        viewModelScope.launch {
+            repository.updateProduct(product.copy(isFeatured = !product.isFeatured))
         }
     }
 

@@ -435,8 +435,7 @@ fun AuthScreen(
     if (showGoogleDialog) {
         val detectedAccounts = listOf(
             "emmanuelmulongo46@gmail.com" to "Emmanuel Mulongo",
-            "hawk.inductions.official@gmail.com" to "Hawk Operations",
-            "admin1@induction.com" to "Hawk Administrator"
+            "hawk.inductions.official@gmail.com" to "Hawk Operations"
         )
 
         AlertDialog(

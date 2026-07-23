@@ -51,10 +51,10 @@ fun AdminScreen(
     var selectedAdminSubTab by remember { mutableStateOf("ADD") }
 
     // Check strict authorized privileges
-    val isAuthorized = currentUser != null && currentUser!!.isAdmin
+    val isAuthorized = currentUser?.isAdmin == true
 
     if (!isAuthorized) {
-        var quickAdminEmail by remember { mutableStateOf("admin1@induction.com") }
+        var quickAdminEmail by remember { mutableStateOf("") }
         var quickAdminPassword by remember { mutableStateOf("") }
         var isQuickPasswordVisible by remember { mutableStateOf(false) }
         var quickAuthError by remember { mutableStateOf<String?>(null) }
@@ -156,9 +156,9 @@ fun AdminScreen(
                     )
                 )
 
-                if (quickAuthError != null) {
+                quickAuthError?.let { err ->
                     Text(
-                        text = quickAuthError!!,
+                        text = err,
                         color = Color.Red,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -318,11 +318,13 @@ fun AdminScreen(
                     .background(SleekSlate50, RoundedCornerShape(12.dp))
                     .padding(4.dp)
             ) {
+                val pendingOrdersCount = allOrders.count { it.status.contains("Pending", ignoreCase = true) || it.status.contains("Approval", ignoreCase = true) }
                 val tabs = listOf(
-                    "ADD" to "Add System",
-                    "MANAGE" to "Manage Stock",
-                    "ORDERS" to "Customer Orders",
-                    "ADMINS" to "Admins Setup"
+                    "ADD" to "Add",
+                    "SLIDESHOW" to "Slideshow",
+                    "MANAGE" to "Stock",
+                    "ORDERS" to if (pendingOrdersCount > 0) "Approvals ($pendingOrdersCount)" else "Approvals",
+                    "ADMINS" to "Admins"
                 )
                 tabs.forEach { (key, display) ->
                     val isSel = selectedAdminSubTab == key
@@ -625,28 +627,37 @@ fun AdminScreen(
                                 val coils = coilsStr.toIntOrNull()
                                 val warranty = warrantyStr.toIntOrNull()
 
-                                if (title.isBlank() || price == null || watts == null || coils == null || warranty == null) {
-                                    formMessage = "Invalid parameter fields. Please review values."
+                                if (title.isBlank() || description.isBlank() || priceStr.isBlank() ||
+                                    wattsStr.isBlank() || coilsStr.isBlank() || warrantyStr.isBlank() ||
+                                    imageUrl.isBlank() || safetyFeatures.isBlank() || controlType.isBlank() || category.isBlank() ||
+                                    price == null || price <= 0 || watts == null || coils == null || warranty == null) {
+                                    formMessage = "All fields are required! Please ensure no field is left empty."
                                 } else {
                                     viewModel.addProductAdmin(
-                                        title = title,
-                                        description = description,
+                                        title = title.trim(),
+                                        description = description.trim(),
                                         price = price,
                                         powerWatts = watts,
                                         coilsCount = coils,
-                                        imageUrl = imageUrl,
+                                        imageUrl = imageUrl.trim(),
                                         warrantyMonths = warranty,
-                                        safetyFeatures = safetyFeatures,
-                                        controlType = controlType,
+                                        safetyFeatures = safetyFeatures.trim(),
+                                        controlType = controlType.trim(),
                                         isFeatured = isFeatured,
-                                        category = category
+                                        category = category.trim()
                                     )
                                     formMessage = "Successfully launched: $title"
                                     // Reset
                                     title = ""
                                     description = ""
                                     priceStr = ""
+                                    wattsStr = ""
+                                    coilsStr = ""
+                                    warrantyStr = ""
                                     imageUrl = ""
+                                    safetyFeatures = ""
+                                    controlType = ""
+                                    category = "Induction Cooker"
                                     selectedFileName = ""
                                 }
                             },
@@ -658,6 +669,163 @@ fun AdminScreen(
                             )
                         ) {
                             Text("Launch Induction Cooktop", fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                    }
+                }
+
+                "SLIDESHOW" -> {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "Homepage Slideshow & Banner Manager",
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = SleekSlate950,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Text(
+                            text = "Easily add products to the homepage banner slideshow carousel. Items marked featured rotate automatically.",
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = SleekSlate500,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        val featuredList = remember(products) { products.filter { it.isFeatured } }
+                        val notFeaturedList = remember(products) { products.filter { !it.isFeatured } }
+
+                        Text(
+                            text = "Active Slideshow Carousel Products (${featuredList.size})",
+                            fontSize = 13.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold,
+                            color = SleekSlate950,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        if (featuredList.isEmpty()) {
+                            Surface(
+                                color = SleekSlate50,
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, SleekSlate200),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                            ) {
+                                Text(
+                                    text = "No products explicitly pinned to slideshow yet. Tap '+ Add to Slideshow' on any product below.",
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily.SansSerif,
+                                    color = SleekSlate600,
+                                    modifier = Modifier.padding(14.dp)
+                                )
+                            }
+                        } else {
+                            featuredList.forEach { product ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 10.dp)
+                                        .background(Color.White, RoundedCornerShape(14.dp))
+                                        .border(1.5.dp, Color.Black, RoundedCornerShape(14.dp))
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Black, modifier = Modifier.size(14.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = product.title,
+                                                fontSize = 13.sp,
+                                                fontFamily = FontFamily.SansSerif,
+                                                fontWeight = FontWeight.Bold,
+                                                color = SleekSlate950,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                        Text(
+                                            text = "${product.powerWatts}W • ${product.coilsCount} Zone(s) • KSh ${String.format("%,.0f", product.price)}",
+                                            fontSize = 11.sp,
+                                            fontFamily = FontFamily.SansSerif,
+                                            color = SleekSlate500,
+                                            modifier = Modifier.padding(top = 2.dp)
+                                        )
+                                    }
+
+                                    Button(
+                                        onClick = { viewModel.toggleProductSlideshowAdmin(product) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = SleekSlate100,
+                                            contentColor = Color.Red
+                                        ),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                        modifier = Modifier.height(34.dp)
+                                    ) {
+                                        Text("Remove", fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Catalog Stock (Tap to Add to Slideshow)",
+                            fontSize = 13.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold,
+                            color = SleekSlate950,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        if (notFeaturedList.isEmpty()) {
+                            Text("All active products are currently added to the slideshow!", fontSize = 12.sp, color = SleekSlate500)
+                        } else {
+                            notFeaturedList.forEach { product ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                        .background(Color.White, RoundedCornerShape(12.dp))
+                                        .border(1.dp, SleekSlate100, RoundedCornerShape(12.dp))
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = product.title,
+                                            fontSize = 13.sp,
+                                            fontFamily = FontFamily.SansSerif,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = SleekSlate950,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "${product.powerWatts}W • KSh ${String.format("%,.0f", product.price)}",
+                                            fontSize = 11.sp,
+                                            fontFamily = FontFamily.SansSerif,
+                                            color = SleekSlate500
+                                        )
+                                    }
+
+                                    Button(
+                                        onClick = { viewModel.toggleProductSlideshowAdmin(product) },
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Black,
+                                            contentColor = Color.White
+                                        ),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                        modifier = Modifier.height(34.dp)
+                                    ) {
+                                        Text("+ Add to Slideshow", fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -730,13 +898,50 @@ fun AdminScreen(
                 "ORDERS" -> {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Customer Transactions",
+                            text = "Customer Order Approvals & Status Tracking",
                             fontSize = 15.sp,
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.ExtraBold,
                             color = SleekSlate950,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Text(
+                            text = "Review payment details and approve customer purchases for fulfillment and dispatch.",
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily.SansSerif,
+                            color = SleekSlate500,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
+
+                        val pendingOrders = allOrders.filter { it.status.contains("Pending", ignoreCase = true) || it.status.contains("Approval", ignoreCase = true) }
+
+                        if (pendingOrders.isNotEmpty()) {
+                            Surface(
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.Yellow)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "${pendingOrders.size} Order(s) Awaiting Admin Payment Approval",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = FontFamily.SansSerif,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
 
                         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
@@ -744,13 +949,15 @@ fun AdminScreen(
                             Text("No customer transactions submitted yet.", fontSize = 13.sp, fontFamily = FontFamily.SansSerif, color = SleekSlate500)
                         } else {
                             allOrders.forEach { order ->
+                                val isPending = order.status.contains("Pending", ignoreCase = true) || order.status.contains("Approval", ignoreCase = true)
+
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 16.dp)
                                         .background(Color.White, RoundedCornerShape(16.dp))
-                                        .border(1.dp, SleekSlate100, RoundedCornerShape(16.dp))
-                                        .padding(14.dp)
+                                        .border(if (isPending) 2.dp else 1.dp, if (isPending) Color.Black else SleekSlate100, RoundedCornerShape(16.dp))
+                                        .padding(16.dp)
                                 ) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -766,11 +973,12 @@ fun AdminScreen(
                                                 color = SleekSlate950
                                             )
                                             Text(
-                                                text = order.userEmail,
+                                                text = "Customer: ${order.userEmail}",
                                                 fontSize = 12.sp,
                                                 fontFamily = FontFamily.SansSerif,
-                                                color = SleekSlate600,
-                                                modifier = Modifier.padding(top = 1.dp)
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = SleekSlate700,
+                                                modifier = Modifier.padding(top = 2.dp)
                                             )
                                             Text(
                                                 text = sdf.format(Date(order.orderDate)),
@@ -782,17 +990,19 @@ fun AdminScreen(
                                         }
 
                                         Text(
-                                            text = order.status,
+                                            text = order.status.uppercase(),
                                             fontSize = 10.sp,
                                             fontFamily = FontFamily.SansSerif,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (order.status.contains("Approval")) Color.Black else SleekSlate500,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = if (isPending) Color.White else SleekSlate700,
                                             modifier = Modifier
-                                                .background(if (order.status.contains("Approval")) SleekSlate200 else SleekSlate100, RoundedCornerShape(8.dp))
-                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                                .background(if (isPending) Color.Black else SleekSlate100, RoundedCornerShape(8.dp))
+                                                .padding(horizontal = 10.dp, vertical = 5.dp)
                                         )
                                     }
 
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    HorizontalDivider(color = SleekSlate100)
                                     Spacer(modifier = Modifier.height(12.dp))
 
                                     Row(
@@ -802,41 +1012,58 @@ fun AdminScreen(
                                     ) {
                                         Column {
                                             Text(
-                                                text = "Ref: ${order.paybillReference}",
+                                                text = "Paybill Ref: ${order.paybillReference}",
                                                 fontSize = 12.sp,
-                                                fontFamily = FontFamily.SansSerif,
+                                                fontFamily = FontFamily.Monospace,
                                                 fontWeight = FontWeight.Bold,
                                                 color = SleekSlate950
                                             )
                                             Text(
-                                                text = "Total: KSh ${String.format("%,.0f", order.totalAmount)}",
-                                                fontSize = 12.sp,
+                                                text = "Total Amount: KSh ${String.format("%,.0f", order.totalAmount)}",
+                                                fontSize = 13.sp,
                                                 fontFamily = FontFamily.SansSerif,
-                                                color = SleekSlate600
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = Color.Black
                                             )
                                         }
 
-                                        // Status management triggers
-                                        if (order.status != "APPROVED & DISPATCHED" && order.status != "Delivered") {
+                                        if (isPending) {
+                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                OutlinedButton(
+                                                    onClick = { viewModel.updateOrderStatusAdmin(order.id, "DECLINED") },
+                                                    shape = RoundedCornerShape(12.dp),
+                                                    border = BorderStroke(1.dp, SleekSlate300),
+                                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                                    modifier = Modifier.height(38.dp)
+                                                ) {
+                                                    Text("Decline", fontSize = 11.sp, color = SleekSlate700, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
+                                                }
+
+                                                Button(
+                                                    onClick = { viewModel.updateOrderStatusAdmin(order.id, "APPROVED & DISPATCHED") },
+                                                    shape = RoundedCornerShape(12.dp),
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = Color.Black,
+                                                        contentColor = Color.White
+                                                    ),
+                                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                                    modifier = Modifier.height(38.dp)
+                                                ) {
+                                                    Text("APPROVE ORDER", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, fontFamily = FontFamily.SansSerif)
+                                                }
+                                            }
+                                        } else if (order.status == "APPROVED & DISPATCHED") {
                                             Button(
-                                                onClick = {
-                                                    val nextStatus = if (order.status == "Pending Approval") "APPROVED & DISPATCHED" else "Delivered"
-                                                    viewModel.updateOrderStatusAdmin(order.id, nextStatus)
-                                                },
-                                                shape = RoundedCornerShape(16.dp),
+                                                onClick = { viewModel.updateOrderStatusAdmin(order.id, "Delivered") },
+                                                shape = RoundedCornerShape(12.dp),
                                                 colors = ButtonDefaults.buttonColors(
-                                                    containerColor = Color.Black,
-                                                    contentColor = Color.White
+                                                    containerColor = SleekSlate100,
+                                                    contentColor = Color.Black
                                                 ),
-                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                                                 modifier = Modifier.height(36.dp)
                                             ) {
-                                                Text(
-                                                    text = if (order.status == "Pending Approval") "APPROVE PAYMENT & DISPATCH" else "MARK DELIVERED",
-                                                    fontSize = 11.sp,
-                                                    fontFamily = FontFamily.SansSerif,
-                                                    fontWeight = FontWeight.Bold
-                                                )
+                                                Text("Mark Delivered", fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
                                             }
                                         }
                                     }
@@ -1080,26 +1307,29 @@ fun AdminScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        val newPrice = editPriceStr.toDoubleOrNull() ?: editingProduct!!.price
-                        val newWatts = editWattsStr.toIntOrNull() ?: editingProduct!!.powerWatts
-                        val newCoils = editCoilsStr.toIntOrNull() ?: editingProduct!!.coilsCount
-                        val newWarranty = editWarrantyStr.toIntOrNull() ?: editingProduct!!.warrantyMonths
-                        
-                        if (editTitleStr.isNotBlank() && editingProduct != null) {
-                            viewModel.updateProductAdmin(
-                                editingProduct!!.copy(
-                                    title = editTitleStr,
-                                    description = editDescriptionStr,
-                                    price = newPrice,
-                                    powerWatts = newWatts,
-                                    coilsCount = newCoils,
-                                    warrantyMonths = newWarranty,
-                                    imageUrl = editImageUrl.trim(),
-                                    controlType = editControlTypeStr,
-                                    safetyFeatures = editSafetyFeaturesStr
+                        val prod = editingProduct
+                        if (prod != null) {
+                            val newPrice = editPriceStr.toDoubleOrNull() ?: prod.price
+                            val newWatts = editWattsStr.toIntOrNull() ?: prod.powerWatts
+                            val newCoils = editCoilsStr.toIntOrNull() ?: prod.coilsCount
+                            val newWarranty = editWarrantyStr.toIntOrNull() ?: prod.warrantyMonths
+                            
+                            if (editTitleStr.isNotBlank()) {
+                                viewModel.updateProductAdmin(
+                                    prod.copy(
+                                        title = editTitleStr,
+                                        description = editDescriptionStr,
+                                        price = newPrice,
+                                        powerWatts = newWatts,
+                                        coilsCount = newCoils,
+                                        warrantyMonths = newWarranty,
+                                        imageUrl = editImageUrl.trim(),
+                                        controlType = editControlTypeStr,
+                                        safetyFeatures = editSafetyFeaturesStr
+                                    )
                                 )
-                            )
-                            editingProduct = null
+                                editingProduct = null
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),

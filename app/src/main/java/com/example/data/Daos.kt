@@ -13,6 +13,9 @@ interface ProductDao {
     @Query("SELECT * FROM products ORDER BY id DESC")
     fun getAllProducts(): Flow<List<Product>>
 
+    @Query("SELECT COUNT(*) FROM products")
+    suspend fun getProductCount(): Int
+
     @Query("SELECT * FROM products WHERE id = :id")
     suspend fun getProductById(id: Int): Product?
 
@@ -42,6 +45,9 @@ interface UserDao {
 interface ReviewDao {
     @Query("SELECT * FROM reviews WHERE productId = :productId ORDER BY timestamp DESC")
     fun getReviewsForProduct(productId: Int): Flow<List<Review>>
+
+    @Query("SELECT * FROM reviews ORDER BY timestamp DESC")
+    fun getAllReviews(): Flow<List<Review>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReview(review: Review)
