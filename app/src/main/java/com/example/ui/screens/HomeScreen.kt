@@ -125,7 +125,9 @@ fun HomeScreen(
     // Filter Products based on category and search query
     val filteredProducts = remember(products, selectedCategory, searchQuery) {
         var list = products
-        if (selectedCategory != "ALL") {
+        if (selectedCategory == "SPECIAL_OFFERS") {
+            list = list.filter { it.isFeatured }
+        } else if (selectedCategory != "ALL") {
             list = list.filter { it.category == selectedCategory }
         }
         if (searchQuery.isNotBlank()) {
@@ -404,7 +406,7 @@ fun HomeScreen(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 6.dp),
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             shape = RoundedCornerShape(24.dp),
             leadingIcon = {
                 Icon(
@@ -437,12 +439,13 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 6.dp),
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val cats = listOf(
                 "ALL" to "All Products",
+                "SPECIAL_OFFERS" to "🔥 Slideshow Offers",
                 "Induction Cookers" to "Induction Cookers",
                 "Sufurias & Cookware" to "Sufurias & Cookware",
                 "Non-Stick Pans" to "Non-Stick Pans"

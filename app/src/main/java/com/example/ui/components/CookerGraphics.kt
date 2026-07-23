@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -90,22 +91,42 @@ fun InductionCookerGraphic(
     coils: Int,
     isDark: Boolean = true
 ) {
-    // If the image URL starts with http, render it via Coil. Otherwise, draw our beautiful custom vector cooker!
-    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://") || imageUrl.startsWith("content://")) {
+    val cleanUrl = imageUrl.trim()
+    val resolvedUrl = when {
+        cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://") || cleanUrl.startsWith("content://") -> cleanUrl
+        cleanUrl.equals("aura_single", ignoreCase = true) || title.contains("aura", ignoreCase = true) || title.contains("single", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop"
+        cleanUrl.equals("apex_duo", ignoreCase = true) || title.contains("apex", ignoreCase = true) || title.contains("duo", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop"
+        cleanUrl.equals("zenith_quad", ignoreCase = true) || title.contains("zenith", ignoreCase = true) || title.contains("quad", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&auto=format&fit=crop"
+        cleanUrl.equals("nomad_go", ignoreCase = true) || title.contains("nomad", ignoreCase = true) || title.contains("portable", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=600&auto=format&fit=crop"
+        cleanUrl.equals("sufuria_heavy", ignoreCase = true) || title.contains("sufuria", ignoreCase = true) || title.contains("steel", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=600&auto=format&fit=crop"
+        cleanUrl.equals("nonstick_pan", ignoreCase = true) || title.contains("frying", ignoreCase = true) || title.contains("pan", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&auto=format&fit=crop"
+        cleanUrl.equals("nonstick_wok", ignoreCase = true) || title.contains("wok", ignoreCase = true) ->
+            "https://images.unsplash.com/photo-1584992236310-6edddc08acff?w=600&auto=format&fit=crop"
+        else -> cleanUrl
+    }
+
+    if (resolvedUrl.startsWith("http://") || resolvedUrl.startsWith("https://") || resolvedUrl.startsWith("content://")) {
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(16.dp))
                 .background(if (isDark) Black else OffWhite)
-                .border(1.dp, if (isDark) White.copy(0.15f) else Black.copy(0.15f), RoundedCornerShape(16.dp))
-                .padding(8.dp),
+                .border(1.dp, if (isDark) Color.White.copy(0.2f) else Color.Black.copy(0.15f), RoundedCornerShape(16.dp))
+                .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = imageUrl,
+                model = resolvedUrl,
                 contentDescription = title,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
             )
         }
     } else {
